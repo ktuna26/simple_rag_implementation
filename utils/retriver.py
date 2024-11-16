@@ -51,7 +51,7 @@ class Retriever:
         llm_pipeline = pipeline(
             "text-generation", 
             model=self.llm_model_name, 
-            device=-1,  # device=-1 for CPU
+            device=0,  # device=0 for MPS
             max_length=max_length,  # Control the max length of the generated text
             truncation=True,  # Explicitly enable truncation
             pad_token_id=50256  # Set pad_token_id (50256 is often used for GPT-based models like GPT-2 or GPT-3)

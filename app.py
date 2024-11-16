@@ -22,7 +22,7 @@ def main():
     retriever_pipeline = Retriever(
         index_path="faiss_index",  # Path to the pre-built FAISS index
         embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",  # The embedding model to use for encoding the queries
-        llm_model_name="tiiuae/falcon-7b-instruct"  # Language model used for generating answers from the retrieved documents
+        llm_model_name="google/flan-t5-base"  # Language model used for generating answers from the retrieved documents
     )
     
     # Inform the user that the question-answering loop is starting

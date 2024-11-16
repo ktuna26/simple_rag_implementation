@@ -8,7 +8,7 @@ This repository demonstrates a modular, object-oriented approach to building a *
 
 - **Object-Oriented Design**: Clean, reusable components for data processing and retrieval.
 - **Local Knowledge Base**: Utilize your own documents.
-- **Open-Source Models**: Leverages models like `Falcon-7B` for answer generation.
+- **Open-Source Models**: Leverages models like `Flan-t5-base` for answer generation.
 
 ---
 
@@ -62,7 +62,7 @@ Source Documents: [<Document ...>]
 ## Customization
 
 - **Embedding Model**: Update `sentence-transformers/all-MiniLM-L6-v2` in the scripts.
-- **Language Model**: Change `tiiuae/falcon-7b-instruct` to another Hugging Face model.
+- **Language Model**: Change `google/flan-t5-base` to another Hugging Face model.
 
 ---
 
