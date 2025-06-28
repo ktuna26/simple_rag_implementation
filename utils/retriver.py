@@ -1,8 +1,10 @@
-from langchain.vectorstores import FAISS
+# utils/retriver.py
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFacePipeline
+from langchain_community.vectorstores import FAISS
+from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-from langchain.llms import HuggingFacePipeline
 from transformers import pipeline
-from langchain_huggingface import HuggingFaceEmbeddings  # Updated import
 
 
 class Retriever:
@@ -19,7 +21,7 @@ class Retriever:
         self.embedding_model_name = embedding_model_name  # Embedding model for creating document vectors
         self.llm_model_name = llm_model_name  # Language model for generating answers
 
-    def load_vectorstore(self):
+    def _load_vectorstore(self):
         """
         Load the FAISS vector store from the specified path.
         
@@ -35,7 +37,7 @@ class Retriever:
             allow_dangerous_deserialization=True  # Allow deserialization of potentially unsafe pickle files
         )
 
-    def initialize_llm(self, max_length=100):  # Default max_length of 100 tokens
+    def _initialize_llm(self, max_length=100):  # Default max_length of 100 tokens
         """
         Initialize and load the Hugging Face language model for text generation.
         
@@ -49,7 +51,7 @@ class Retriever:
         """
         # Initialize the text generation pipeline from Hugging Face with the max_length parameter
         llm_pipeline = pipeline(
-            "text-generation", 
+            "text2text-generation", 
             model=self.llm_model_name, 
             device=0,  # device=0 for MPS
             max_length=max_length,  # Control the max length of the generated text
@@ -58,7 +60,7 @@ class Retriever:
         )
         return HuggingFacePipeline(pipeline=llm_pipeline)
 
-    def build_retriever(self, vectorstore):
+    def _build_retriever(self, vectorstore):
         """
         Build the retrieval-based question-answering (QA) chain using the FAISS vector store.
         
@@ -72,10 +74,31 @@ class Retriever:
         retriever = vectorstore.as_retriever()
         
         # Initialize the language model
-        llm = self.initialize_llm(max_length=200)
+        llm = self._initialize_llm(max_length=200)
+        
+        # Create prompt template
+        prompt_template = PromptTemplate.from_template(
+            """You are an intelligent assistant helping users understand information from documents.
+            Answer the question using the context below. Be concise, clear, and informative.
+            If the answer is not in the context, say you don't know. Do not make anything up.
+            
+            Context:
+            {context}
+            
+            Question:
+            {question}
+            
+            Answer:"""
+        )
         
         # Build and return the QA chain using the retriever and language model
-        return RetrievalQA.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True)
+        return RetrievalQA.from_chain_type(
+            llm=llm,
+            retriever=retriever,
+            chain_type="stuff",
+            return_source_documents=True,
+            chain_type_kwargs={"prompt": prompt_template}
+        )
 
     def run(self):
         """
@@ -85,10 +108,10 @@ class Retriever:
         and generates answers using the language model. The source documents are also returned for reference.
         """
         # Load the FAISS vector store
-        vectorstore = self.load_vectorstore()
+        vectorstore = self._load_vectorstore()
         
         # Build the QA chain with the vector store and language model
-        qa_chain = self.build_retriever(vectorstore)
+        qa_chain = self._build_retriever(vectorstore)
 
         # Start the loop where the user can input questions
         while True:

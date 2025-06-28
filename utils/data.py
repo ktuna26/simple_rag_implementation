@@ -1,7 +1,8 @@
-from langchain.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.document_loaders import TextLoader
+# utils/data.py
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
 
 
 class Data:
@@ -19,7 +20,7 @@ class Data:
         self.index_save_path = index_save_path  # Directory to save the FAISS index
         self.embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model_name)  # Instantiate embeddings
 
-    def process_knowledge_base(self):
+    def _process_knowledge_base(self):
         """
         Load the knowledge base document, split it into chunks, and return the chunks.
         
@@ -37,7 +38,7 @@ class Data:
         
         return text_splitter.split_documents(documents)  # Return the split text chunks
 
-    def create_vectorstore(self, texts):
+    def _create_vectorstore(self, texts):
         """
         Create a FAISS vector store from the provided texts and save it locally.
         
@@ -60,7 +61,7 @@ class Data:
         2. Create and save the FAISS vector store with the chunks.
         """
         # Process the knowledge base into smaller chunks
-        texts = self.process_knowledge_base()
+        texts = self._process_knowledge_base()
         
         # Create and save the vector store using the processed chunks
-        self.create_vectorstore(texts)
+        self._create_vectorstore(texts)

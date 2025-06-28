@@ -1,4 +1,8 @@
+import warnings
 from utils import Data, Retriever
+
+warnings.filterwarnings("ignore", message="To copy construct from a tensor*")
+
 
 def main():
     # Step 1: Initialize and run the data pipeline
